@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA Compass — Find Your Fit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #0B1730;
+    --navy: #14213D;
+    --navy-deep: #0A1226;
+    --paper: #FDFCF9;
+    --gold: #FFB627;
+    --coral: #FF6B6B;
+    --teal: #2EC4B6;
+    --line: rgba(253,252,249,0.14);
+    --shadow: 0 20px 50px rgba(10,18,38,0.35);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--navy);
+    background-image:
+      radial-gradient(circle at 10% 8%, rgba(255,182,39,0.10), transparent 40%),
+      radial-gradient(circle at 90% 85%, rgba(46,196,182,0.10), transparent 40%);
+    color: var(--paper);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 32px 16px;
+  }
+
+  .display{ font-family:'Anton', sans-serif; font-weight:400; letter-spacing: 0.01em; text-transform: uppercase; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+
+  .app{
+    width: 100%;
+    max-width: 640px;
+  }
+
+  .masthead{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom: 18px;
+    padding: 0 4px;
+  }
+  .masthead .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(255,182,39,0.4);
+    padding: 4px 8px;
+    border-radius: 3px;
+  }
+  .masthead .issue{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(253,252,249,0.5);
+  }
+
+  .card{
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ---- ticket stub progress ---- */
+  .stub-bar{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    padding: 18px 24px 0 24px;
+  }
+  .stub-track{
+    flex:1;
+    height: 8px;
+    background: rgba(11,23,48,0.08);
+    border-radius: 99px;
+    overflow:hidden;
+    position:relative;
+  }
+  .stub-fill{
+    height:100%;
+    background: linear-gradient(90deg, var(--coral), var(--gold));
+    border-radius: 99px;
+    transition: width 0.45s cubic-bezier(.65,0,.35,1);
+  }
+  .stub-count{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight:600;
+    color: rgba(11,23,48,0.55);
+    white-space:nowrap;
+  }
+
+  .panel{ padding: 28px 28px 32px 28px; }
+
+  /* ---- intro ---- */
+  .intro h1{
+    font-size: clamp(38px, 8vw, 56px);
+    line-height: 0.92;
+    margin: 6px 0 14px 0;
+  }
+  .intro h1 span{ color: var(--coral); }
+  .intro p{
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: rgba(11,23,48,0.72);
+    max-width: 46ch;
+    margin: 0 0 22px 0;
+  }
+  .cat-strip{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 26px;
+  }
+  .cat-chip{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 99px;
+    background: rgba(11,23,48,0.06);
+    color: rgba(11,23,48,0.65);
+  }
+
+  button.primary{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 15px 26px;
+    border-radius: 10px;
+    cursor: pointer;
+    display:inline-flex;
+    align-items:center;
+    gap: 10px;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  button.primary:hover{ background: var(--navy-deep); transform: translateY(-1px); }
+  button.primary:active{ transform: translateY(0); }
+  button.primary:focus-visible{ outline: 3px solid var(--gold); outline-offset:2px; }
+
+  /* ---- question ---- */
+  .q-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--coral);
+    margin: 18px 0 10px 0;
+  }
+  .q-text{
+    font-size: clamp(21px, 4.6vw, 27px);
+    line-height: 1.22;
+    margin: 0 0 22px 0;
+    font-weight: 700;
+    max-width: 30ch;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+  }
+  .opt{
+    text-align:left;
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 15.5px;
+    font-weight: 500;
+    background: rgba(11,23,48,0.035);
+    border: 1.5px solid rgba(11,23,48,0.10);
+    color: var(--ink);
+    padding: 15px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+  .opt .letter{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: var(--ink);
+    color: var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .opt:hover{ border-color: var(--coral); background: rgba(255,107,107,0.06); transform: translateX(2px); }
+  .opt:focus-visible{ outline: 3px solid var(--gold); outline-offset: 1px; }
+
+  .back-link{
+    margin-top: 20px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: rgba(11,23,48,0.4);
+    background:none; border:none; cursor:pointer;
+    padding: 4px 0;
+  }
+  .back-link:hover{ color: rgba(11,23,48,0.7); }
+
+  /* ---- results: membership card ---- */
+  .result-head{
+    text-align:center;
+    padding-top: 6px;
+  }
+  .result-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--coral);
+  }
+  .badge{
+    position: relative;
+    margin: 18px auto 8px auto;
+    max-width: 420px;
+    background: var(--navy);
+    color: var(--paper);
+    border-radius: 16px;
+    padding: 26px 24px 22px 24px;
+    text-align:left;
+    box-shadow: 0 14px 30px rgba(20,33,61,0.35);
+    background-image: radial-gradient(circle at 100% 0%, rgba(255,182,39,0.18), transparent 55%);
+  }
+  .badge::before{
+    content: "MATCHED";
+    position:absolute;
+    top: 14px; right: -34px;
+    background: var(--coral);
+    color: var(--paper);
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    font-weight:700;
+    padding: 4px 38px;
+    transform: rotate(35deg);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  }
+  .badge .kicker{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .badge h2{
+    font-family:'Anton', sans-serif;
+    text-transform: uppercase;
+    font-size: 30px;
+    margin: 0 0 10px 0;
+    line-height: 1.05;
+    max-width: 85%;
+  }
+  .badge p{
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(253,252,249,0.78);
+    margin: 0;
+  }
+  .badge .stamp-row{
+    display:flex; gap:8px; margin-top:16px; flex-wrap:wrap;
+  }
+  .badge .stamp{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    border: 1px solid rgba(253,252,249,0.3);
+    padding: 4px 9px;
+    border-radius: 99px;
+    color: rgba(253,252,249,0.75);
+  }
+
+  .runner-ups{
+    margin-top: 22px;
+  }
+  .runner-ups .label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(11,23,48,0.45);
+    margin-bottom: 10px;
+  }
+  .runner{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding: 13px 16px;
+    border: 1px solid rgba(11,23,48,0.10);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .runner .name{ font-weight:700; font-size: 14.5px; }
+  .runner .sub{ font-size: 12.5px; color: rgba(11,23,48,0.55); margin-top:2px; }
+  .runner .pct{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--coral);
+    font-weight: 700;
+  }
+
+  .result-actions{
+    display:flex;
+    gap: 10px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  button.ghost{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight:600;
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid rgba(11,23,48,0.2);
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor:pointer;
+  }
+  button.ghost:hover{ border-color: var(--ink); }
+
+  footer{
+    text-align:center;
+    margin-top: 18px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(253,252,249,0.4);
+  }
+
+  .hidden{ display:none !important; }
+
+  @media (max-width: 480px){
+    .panel{ padding: 22px 18px 26px 18px; }
+    .badge{ padding: 22px 18px 20px 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="masthead">
+    <span class="tag">CCA COMPASS</span>
+    <span class="issue mono" id="issueTag">Sign-up season · 2026</span>
+  </div>
+
+  <div class="card">
+    <div class="stub-bar" id="stubBar">
+      <div class="stub-track"><div class="stub-fill" id="stubFill" style="width:0%"></div></div>
+      <div class="stub-count mono" id="stubCount">0/8</div>
+    </div>
+
+    <!-- INTRO -->
+    <div class="panel intro" id="screenIntro">
+      <div class="q-eyebrow">FIND YOUR FIT</div>
+      <h1>What CCA<br>is actually<br><span>for you?</span></h1>
+      <p>Eight quick questions about how you like to spend your time, not what looks good on paper. Answer honestly and we'll match you to the CCAs that fit.</p>
+      <div class="cat-strip">
+        <span class="cat-chip">Sports</span>
+        <span class="cat-chip">Performing Arts</span>
+        <span class="cat-chip">Visual Arts &amp; Media</span>
+        <span class="cat-chip">Uniformed Groups</span>
+        <span class="cat-chip">Tech &amp; Robotics</span>
+        <span class="cat-chip">Service &amp; Outreach</span>
+        <span class="cat-chip">Debate &amp; Academic</span>
+      </div>
+      <button class="primary" id="startBtn">Start the quiz →</button>
+    </div>
+
+    <!-- QUESTION -->
+    <div class="panel hidden" id="screenQuestion">
+      <div class="q-eyebrow" id="qEyebrow">QUESTION 1</div>
+      <div class="q-text" id="qText"></div>
+      <div class="options" id="qOptions"></div>
+      <button class="back-link" id="backBtn">← back</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="panel hidden" id="screenResults">
+      <div class="result-head">
+        <div class="result-eyebrow">YOUR MATCH</div>
+      </div>
+      <div class="badge">
+        <div class="kicker mono" id="badgeKicker">TOP CATEGORY</div>
+        <h2 id="badgeTitle"></h2>
+        <p id="badgeDesc"></p>
+        <div class="stamp-row" id="badgeStamps"></div>
+      </div>
+
+      <div class="runner-ups">
+        <div class="label">Also worth checking out</div>
+        <div id="runnerList"></div>
+      </div>
+
+      <div class="result-actions">
+        <button class="primary" id="retakeBtn">Retake quiz</button>
+        <button class="ghost" id="shareBtn">Copy result</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Built by the CCA Office · Talk to your Form Teacher or the CCA Office to sign up</footer>
+</div>
+
+<script>
+(function(){
+
+  // ---- categories ----
+  const CATEGORIES = {
+    sports: {
+      title: "Sports & Fitness",
+      desc: "You're happiest moving, competing, and pushing your limits with a team behind you. Try:",
+      ccas: ["Track & Field", "Basketball", "Floorball", "Swimming", "Netball / Football"]
+    },
+    performing: {
+      title: "Performing Arts",
+      desc: "You come alive on a stage or behind an instrument, and rehearsal is where you do your best thinking. Try:",
+      ccas: ["Drama Club", "Dance", "Choir", "Symphonic / Concert Band", "Guitar Ensemble"]
+    },
+    visual: {
+      title: "Visual Arts & Media",
+      desc: "You think in images and like making things people can actually see. Try:",
+      ccas: ["Art Club", "Photography", "Media / AV Club", "Film & Animation", "Yearbook Committee"]
+    },
+    uniformed: {
+      title: "Uniformed Groups",
+      desc: "You like structure, discipline, and earning your stripes with a squad. Try:",
+      ccas: ["National Police Cadet Corps", "National Cadet Corps", "Scouts / Girl Guides", "St John / Red Cross"]
+    },
+    tech: {
+      title: "Tech & Robotics",
+      desc: "You'd rather build the thing than talk about the thing. Try:",
+      ccas: ["Robotics Club", "Coding / Infocomm Club", "AV & Broadcast Crew", "Electronics Club"]
+    },
+    service: {
+      title: "Service & Outreach",
+      desc: "You measure a good week by who you helped, not what you won. Try:",
+      ccas: ["Interact Club", "Community Service Club", "Environment / Green Club", "Befrienders Programme"]
+    },
+    debate: {
+      title: "Debate & Academic",
+      desc: "You like a good argument, a hard problem, or a room you can win over with words. Try:",
+      ccas: ["Debate Society", "Model United Nations", "Science Club", "Quiz / Academic Bowl"]
+    }
+  };
+
+  // ---- questions: each option scores 1-2 categories ----
+  const QUESTIONS = [
+    {
+      q: "It's a free Saturday afternoon. You'd rather be...",
+      opts: [
+        { t: "Out on a field or court, working up a sweat", s: { sports: 2 } },
+        { t: "In a rehearsal room running lines or choreography", s: { performing: 2 } },
+        { t: "Tinkering with a gadget or a half-finished project", s: { tech: 2 } },
+        { t: "Volunteering somewhere that actually needs the help", s: { service: 2 } }
+      ]
+    },
+    {
+      q: "Pick the win that would make your week.",
+      opts: [
+        { t: "Your team makes it to the finals", s: { sports: 2, uniformed: 1 } },
+        { t: "The crowd actually gets goosebumps at your show", s: { performing: 2 } },
+        { t: "You win an argument nobody thought you could", s: { debate: 2 } },
+        { t: "Something you built actually works", s: { tech: 2 } }
+      ]
+    },
+    {
+      q: "How do you like to work?",
+      opts: [
+        { t: "In a squad, with clear roles and a shared drill", s: { uniformed: 2, sports: 1 } },
+        { t: "Solo, deep in focus, until it's exactly right", s: { visual: 2, tech: 1 } },
+        { t: "In a small group bouncing ideas around fast", s: { debate: 2, performing: 1 } },
+        { t: "Whoever needs an extra pair of hands, I'm there", s: { service: 2 } }
+      ]
+    },
+    {
+      q: "Which of these would genuinely stress you out?",
+      opts: [
+        { t: "Being on stage with everyone watching", s: { tech: 1, visual: 1 } },
+        { t: "Sitting still with nothing physical to do", s: { sports: 2 } },
+        { t: "Long stretches of total silence and solo work", s: { performing: 1, debate: 1 } },
+        { t: "Rigid rules and someone barking instructions", s: { visual: 1, debate: 1 } }
+      ]
+    },
+    {
+      q: "Pick a skill you'd actually want to walk away with.",
+      opts: [
+        { t: "Discipline, leadership, and grit under pressure", s: { uniformed: 2 } },
+        { t: "Confidence performing in front of a crowd", s: { performing: 2 } },
+        { t: "Thinking on your feet and arguing clearly", s: { debate: 2 } },
+        { t: "A technical skill you could actually build a career on", s: { tech: 2 } }
+      ]
+    },
+    {
+      q: "Where do you want to spend most of your CCA time?",
+      opts: [
+        { t: "Outdoors — field, track, or open ground", s: { sports: 2, uniformed: 1 } },
+        { t: "A studio, stage, or practice room", s: { performing: 2, visual: 1 } },
+        { t: "A workshop, lab, or computer room", s: { tech: 2 } },
+        { t: "Wherever the community project takes me", s: { service: 2 } }
+      ]
+    },
+    {
+      q: "Your friends would describe you as the one who's...",
+      opts: [
+        { t: "Competitive, and low-key hates losing", s: { sports: 2 } },
+        { t: "Always got an opinion, and can defend it", s: { debate: 2 } },
+        { t: "The creative one with the eye for detail", s: { visual: 2 } },
+        { t: "The reliable one who actually shows up to help", s: { service: 2, uniformed: 1 } }
+      ]
+    },
+    {
+      q: "Last one — what would make a CCA feel like a waste of time?",
+      opts: [
+        { t: "No real competition or way to measure progress", s: { sports: 1, debate: 1 } },
+        { t: "Nothing gets made or performed at the end of it", s: { performing: 1, visual: 1 } },
+        { t: "It doesn't help anyone but the people in it", s: { service: 2 } },
+        { t: "No structure, ranks, or sense of progression", s: { uniformed: 2 } }
+      ]
+    }
+  ];
+
+  // ---- state ----
+  let current = 0;
+  let scores = {};
+  let answered = [];
+
+  const screenIntro = document.getElementById('screenIntro');
+  const screenQuestion = document.getElementById('screenQuestion');
+  const screenResults = document.getElementById('screenResults');
+  const stubBar = document.getElementById('stubBar');
+  const stubFill = document.getElementById('stubFill');
+  const stubCount = document.getElementById('stubCount');
+
+  function resetState(){
+    current = 0;
+    scores = {};
+    answered = [];
+    Object.keys(CATEGORIES).forEach(k => scores[k] = 0);
+  }
+  resetState();
+
+  function showScreen(el){
+    [screenIntro, screenQuestion, screenResults].forEach(s => s.classList.add('hidden'));
+    el.classList.remove('hidden');
+  }
+
+  document.getElementById('startBtn').addEventListener('click', () => {
+    stubBar.classList.remove('hidden');
+    renderQuestion();
+    showScreen(screenQuestion);
+  });
+
+  function updateProgress(){
+    const pct = Math.round((current / QUESTIONS.length) * 100);
+    stubFill.style.width = pct + '%';
+    stubCount.textContent = current + '/' + QUESTIONS.length;
+  }
+
+  function renderQuestion(){
+    updateProgress();
+    const item = QUESTIONS[current];
+    document.getElementById('qEyebrow').textContent = 'QUESTION ' + (current + 1) + ' OF ' + QUESTIONS.length;
+    document.getElementById('qText').textContent = item.q;
+    const wrap = document.getElementById('qOptions');
+    wrap.innerHTML = '';
+    const letters = ['A','B','C','D'];
+    item.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt';
+      btn.innerHTML = '<span class="letter">' + letters[i] + '</span><span>' + opt.t + '</span>';
+      btn.addEventListener('click', () => selectOption(opt));
+      wrap.appendChild(btn);
+    });
+    document.getElementById('backBtn').style.visibility = current === 0 ? 'hidden' : 'visible';
+  }
+
+  function selectOption(opt){
+    answered[current] = opt;
+    Object.keys(opt.s).forEach(cat => { scores[cat] += opt.s[cat]; });
+    current++;
+    if (current >= QUESTIONS.length){
+      renderResults();
+      showScreen(screenResults);
+    } else {
+      renderQuestion();
+    }
+  }
+
+  document.getElementById('backBtn').addEventListener('click', () => {
+    if (current === 0) return;
+    const prevOpt = answered[current - 1];
+    if (prevOpt){
+      Object.keys(prevOpt.s).forEach(cat => { scores[cat] -= prevOpt.s[cat]; });
+    }
+    current--;
+    renderQuestion();
+  });
+
+  function renderResults(){
+    updateProgress();
+    const ranked = Object.keys(scores)
+      .map(k => ({ key: k, score: scores[k] }))
+      .sort((a, b) => b.score - a.score);
+
+    const total = ranked.reduce((sum, r) => sum + r.score, 0) || 1;
+
+    const top = ranked[0];
+    const cat = CATEGORIES[top.key];
+    document.getElementById('badgeKicker').textContent = Math.round((top.score/total)*100) + '% MATCH';
+    document.getElementById('badgeTitle').textContent = cat.title;
+    document.getElementById('badgeDesc').textContent = cat.desc;
+    const stampWrap = document.getElementById('badgeStamps');
+    stampWrap.innerHTML = '';
+    cat.ccas.forEach(name => {
+      const s = document.createElement('span');
+      s.className = 'stamp';
+      s.textContent = name;
+      stampWrap.appendChild(s);
+    });
+
+    const runnerList = document.getElementById('runnerList');
+    runnerList.innerHTML = '';
+    ranked.slice(1, 3).forEach(r => {
+      const c = CATEGORIES[r.key];
+      const row = document.createElement('div');
+      row.className = 'runner';
+      row.innerHTML =
+        '<div><div class="name">' + c.title + '</div>' +
+        '<div class="sub">' + c.ccas.slice(0,3).join(' · ') + '</div></div>' +
+        '<div class="pct mono">' + Math.round((r.score/total)*100) + '%</div>';
+      runnerList.appendChild(row);
+    });
+  }
+
+  document.getElementById('retakeBtn').addEventListener('click', () => {
+    resetState();
+    stubBar.classList.remove('hidden');
+    showScreen(screenIntro);
+  });
+
+  document.getElementById('shareBtn').addEventListener('click', () => {
+    const title = document.getElementById('badgeTitle').textContent;
+    const text = "My CCA Compass match: " + title + ". Take the quiz to find yours!";
+    navigator.clipboard && navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('shareBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    });
+  });
+
+  // hide progress bar on intro initially
+  stubBar.classList.add('hidden');
+
+})();
+</script>
+
+</body>
+</html>
